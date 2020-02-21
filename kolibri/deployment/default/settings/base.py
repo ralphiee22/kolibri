@@ -26,6 +26,14 @@ from kolibri.plugins.utils.settings import apply_settings
 from kolibri.utils import conf
 from kolibri.utils import i18n
 
+try:
+    isolation_level = None
+    import psycopg2  # noqa
+
+    isolation_level = psycopg2.extensions.ISOLATION_LEVEL_SERIALIZABLE
+except ImportError:
+    pass
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 # import kolibri, so we can get the path to the module.
@@ -159,7 +167,16 @@ elif conf.OPTIONS["Database"]["DATABASE_ENGINE"] == "postgres":
             "USER": conf.OPTIONS["Database"]["DATABASE_USER"],
             "HOST": conf.OPTIONS["Database"]["DATABASE_HOST"],
             "PORT": conf.OPTIONS["Database"]["DATABASE_PORT"],
-        }
+        },
+        "default_serializable": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": conf.OPTIONS["Database"]["DATABASE_NAME"],
+            "PASSWORD": conf.OPTIONS["Database"]["DATABASE_PASSWORD"],
+            "USER": conf.OPTIONS["Database"]["DATABASE_USER"],
+            "HOST": conf.OPTIONS["Database"]["DATABASE_HOST"],
+            "PORT": conf.OPTIONS["Database"]["DATABASE_PORT"],
+            "OPTIONS": {"isolation_level": isolation_level},
+        },
     }
 
 
